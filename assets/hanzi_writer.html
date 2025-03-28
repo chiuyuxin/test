@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@2.2.0/dist/hanzi-writer.min.js"></script>
+    <title>筆順驗證</title>
+    <style>
+        body { display: flex; flex-direction: column; align-items: center; height: 100vh; margin: 0; }
+        #target { width: 300px; height: 300px; margin-top: 20px; }
+        button { margin-top: 20px; padding: 10px 20px; font-size: 16px; }
+    </style>
+</head>
+<body>
+<h2 id="char-title"></h2>
+<div id="target"></div>
+<button onclick="startQuiz()">開始書寫</button>
+
+<script>
+    let writer;
+
+    function loadCharacter(character) {
+        document.getElementById('char-title').innerText = `請書寫: ${character}`;
+        writer = HanziWriter.create('target', character, {
+            width: 300,
+            height: 300,
+            padding: 10,
+            strokeColor: '#555',
+            radicalColor: '#FF5722',
+            showOutline: true,
+            showCharacter: false,
+        });
+    }
+
+    function startQuiz() {
+        writer.quiz({
+            onComplete: () => {
+                sendMessageToFlutter("correct");
+            },
+            onMistake: (strokeData) => {
+                sendMessageToFlutter("incorrect");
+            }
+        });
+    }
+
+    function sendMessageToFlutter(message) {
+        if (window.flutter_inappwebview) {
+            window.flutter_inappwebview.callHandler('onResult', message);
+        }
+    }
+</script>
+</body>
+</html>
